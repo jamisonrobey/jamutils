@@ -29,8 +29,7 @@ public:
     other.fd_ = -1;
   }
 
-  FD&
-  operator=(FD&& other) noexcept {
+  FD& operator=(FD&& other) noexcept {
     if (this != &other) {
       if (fd_ >= 0) {
         close(fd_);
