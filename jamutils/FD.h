@@ -8,7 +8,7 @@
 namespace jam_utils {
 class FD {
 public:
-  explicit FD(const int fd) : fd_(fd) {
+  explicit FD(const int fd) : fd_{fd} {
     if (fd_ < 0)
       throw std::invalid_argument("FD(int) ctor given negative descriptor");
   }
