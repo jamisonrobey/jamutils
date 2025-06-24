@@ -46,8 +46,8 @@ public:
     }
   }
 
-  [[nodiscard]] int
-  fd() const noexcept {
+  [[nodiscard]]
+  int fd() const noexcept {
     return fd_;
   }
 

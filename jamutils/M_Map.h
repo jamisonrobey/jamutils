@@ -9,19 +9,21 @@
 namespace jam_utils {
 class M_Map {
 public:
-  M_Map(const size_t length, const int prot, const int flags,
-        const int fd, const off_t offset) :
+  M_Map(const size_t length,
+        const int prot,
+        const int flags,
+        const int fd,
+        const off_t offset) :
     addr_{mmap(nullptr, length, prot, flags, fd, offset)}, len_{length} {
     if (addr_ == MAP_FAILED)
-      throw std::system_error(errno, std::system_category(), "mmap failed");
+      throw std::system_error(errno, std::system_category(), "mmap");
   }
 
   M_Map(const M_Map&) = delete;
 
   M_Map& operator=(const M_Map&) = delete;
 
-  M_Map(M_Map&& other) noexcept : addr_{other.addr_}, len_{other.len_},
-                {
+  M_Map(M_Map&& other) noexcept : addr_{other.addr_}, len_{other.len_} {
     other.addr_ = nullptr;
     other.len_ = 0;
   }
@@ -46,11 +48,15 @@ public:
     }
   }
 
-  [[nodiscard]] void* addr() const noexcept {
+  [[nodiscard]]
+  void* addr() const noexcept {
     return addr_;
   }
 
-  [[nodiscard]] size_t len() const noexcept { return len_; }
+  [[nodiscard]]
+  size_t len() const noexcept {
+    return len_;
+  }
 
 private:
   void* addr_{nullptr};
