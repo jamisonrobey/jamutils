@@ -62,6 +62,13 @@ public:
     return addr_;
   }
 
+  template <typename T>
+  [[nodiscard]]
+  std::span<T> as_span() const noexcept {
+    return {static_cast<T*>(addr_), len_ / sizeof(T)};
+  }
+
+
   [[nodiscard]]
   size_t len() const noexcept {
     return len_;
