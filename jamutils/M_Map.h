@@ -12,9 +12,11 @@ public:
   M_Map(const size_t length,
         const int prot,
         const int flags,
-        const int fd,
+        FD&& fd,
         const off_t offset) :
-    addr_{mmap(nullptr, length, prot, flags, fd, offset)}, len_{length} {
+    fd_{std::move(fd)},
+    addr_{mmap(nullptr, length, prot, flags, fd_.fd(), offset)},
+    len_{length} {
     if (addr_ == MAP_FAILED)
       throw std::system_error(errno, std::system_category(), "mmap");
   }
@@ -23,7 +25,8 @@ public:
 
   M_Map& operator=(const M_Map&) = delete;
 
-  M_Map(M_Map&& other) noexcept : addr_{other.addr_}, len_{other.len_} {
+  M_Map(M_Map&& other) noexcept : fd_{std::move(other.fd_)}, addr_{other.addr_},
+                                  len_{other.len_} {
     other.addr_ = nullptr;
     other.len_ = 0;
   }
@@ -35,6 +38,7 @@ public:
       }
       addr_ = other.addr_;
       len_ = other.len_;
+      fd_ = std::move(other.fd_);
 
       other.addr_ = nullptr;
       other.len_ = 0;
@@ -49,6 +53,11 @@ public:
   }
 
   [[nodiscard]]
+  int fd() const noexcept {
+    return fd_.fd();
+  }
+
+  [[nodiscard]]
   void* addr() const noexcept {
     return addr_;
   }
@@ -59,6 +68,7 @@ public:
   }
 
 private:
+  FD fd_;
   void* addr_{nullptr};
   size_t len_{};
 };
