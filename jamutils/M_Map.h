@@ -57,9 +57,10 @@ public:
     return fd_.fd();
   }
 
+  template <typename T = void>
   [[nodiscard]]
-  void* addr() const noexcept {
-    return addr_;
+  T* addr() const noexcept {
+    return static_cast<T*>(addr_);
   }
 
   template <typename T>
