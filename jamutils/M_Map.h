@@ -22,27 +22,25 @@ public:
   }
 
   M_Map(const M_Map&) = delete;
-
   M_Map& operator=(const M_Map&) = delete;
 
-  M_Map(M_Map&& other) noexcept : fd_{std::move(other.fd_)}, addr_{other.addr_},
-                                  len_{other.len_} {
-    other.addr_ = nullptr;
-    other.len_ = 0;
-  }
+  M_Map(M_Map&& other) noexcept : fd_{std::move(other.fd_)},
+                                  addr_{std::exchange(other.addr_, nullptr)},
+                                  len_{other.len_} {}
+
 
   M_Map& operator=(M_Map&& other) noexcept {
-    if (this != &other) {
-      if (addr_) {
-        munmap(addr_, len_);
-      }
-      addr_ = other.addr_;
-      len_ = other.len_;
-      fd_ = std::move(other.fd_);
+    if (this == &other)
+      return *this;
 
-      other.addr_ = nullptr;
-      other.len_ = 0;
+    if (addr_) {
+      munmap(addr_, len_);
     }
+
+    fd_ = std::move(other.fd_);
+    addr_ = std::exchange(other.addr_, nullptr);
+    len_ = other.len_;
+
     return *this;
   }
 
