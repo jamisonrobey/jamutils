@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
 project(jamutils)
 add_library(jamutils STATIC jamutils/FD.h jamutils/M_Map.h)
+set_target_properties(jamutils PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(jamutils PUBLIC ${PROJECT_SOURCE_DIR})
