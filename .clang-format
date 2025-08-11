@@ -1,1 +1,4 @@
-BasedOnStyle: Google
+BasedOnStyle: Microsoft
+AllowShortFunctionsOnASingleLine: All
+PointerAlignment: Left
+FixNamespaceComments: false
