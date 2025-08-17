@@ -14,21 +14,13 @@ namespace jam_utils
 class M_Map
 {
   public:
-    M_Map(size_t length, int prot, int flags, FD&& fd, off_t offset)
-        : fd_{std::move(fd)}, addr_{mmap(nullptr, length, prot, flags, fd_.fd(), offset)}, len_{length}
+    M_Map(std::filesystem::path file, int prot, int flags, off_t offset)
+        : fd_{FD{file.c_str()}},
+          len_{std::filesystem::file_size(file)},
+          addr_{mmap(nullptr, len_, prot, flags, fd_.fd(), offset)}
     {
         if (addr_ == MAP_FAILED)
-        {
-            throw std::system_error(errno, std::system_category());
-        }
-    }
-
-    M_Map(const M_Map&) = delete;
-    M_Map& operator=(const M_Map&) = delete;
-
-    M_Map(M_Map&& other) noexcept
-        : fd_{std::move(other.fd_)}, addr_{std::exchange(other.addr_, nullptr)}, len_{other.len_}
-    {
+            throw std::system_error(errno, std::generic_category(), "mmap");
     }
 
     M_Map& operator=(M_Map&& other) noexcept
@@ -61,6 +53,13 @@ class M_Map
         return fd_.fd();
     }
 
+    template <typename T = std::byte>
+    [[nodiscard]]
+    T* at(size_t offset) const noexcept
+    {
+        return static_cast<T*>(static_cast<std::byte*>(addr_) + offset);
+    }
+
     template <typename T = void>
     [[nodiscard]]
     T* addr() const noexcept
@@ -83,9 +82,9 @@ class M_Map
 
   private:
     FD fd_;
-    void* addr_;
     size_t len_;
+    void* addr_;
 };
-}
+} // namespace jam_utils
 
 #endif
